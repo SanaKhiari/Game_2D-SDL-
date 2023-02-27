@@ -1,0 +1,476 @@
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+//#include <SDL/SDL_ttf.h>
+//#include <SDL/SDL_mixer.h>
+#include "enigmeImage.h"
+
+void InitEnigme(enigmeImage *e, char *nomfichier){
+		FILE* f = NULL;
+        char caractereLu;
+        int  ligne=0;
+        char quest[7];
+        char rep1[15];
+        char rep2[15];
+        char rep3[15];
+        char  rep[2];
+	int i;
+        f=fopen(nomfichier,"r");
+        if(f!=NULL){
+        fgets(quest,7,f);
+//                printf("%s",quest);
+        while (caractereLu !=EOF && ligne < 2 )
+                {
+                        caractereLu = fgetc(f);
+                        if ( caractereLu == '\n'){
+                                ligne++;}
+                                fscanf(f,"%s %s %s %s",rep1,rep2,rep3,rep);
+                }
+
+//                printf("%s \n",rep1);
+  //              printf("%s \n",rep2);
+    //            printf("%s \n",rep3);
+      //          printf("%s \n",rep);
+                fclose(f);
+                }else{
+        printf("pas d'ouverture de fichier text !!");
+        }
+
+
+		e->question = IMG_Load(quest);
+		if (e->question == NULL){
+                printf("Unable to load png : %s\n",SDL_GetError());
+                return;
+		}
+		e->pos_question.x=5;
+		e->pos_question.y=50;
+		e->reponse_1=IMG_Load(rep1);
+		if (e->reponse_1 == NULL){
+                printf("Unable to load png : %s\n",SDL_GetError());
+                return;
+                }
+
+		e->pos_reponse_1.x=0;
+		e->pos_reponse_1.y=250;
+		e->reponse_2=IMG_Load(rep2);
+		if (e->reponse_2 == NULL){
+                printf("Unable to load png : %s\n",SDL_GetError());
+                return;
+                }
+                e->pos_reponse_2.x=0;
+                e->pos_reponse_2.y=350;
+		e->reponse_3=IMG_Load(rep3);
+		if (e->reponse_3 == NULL){
+                printf("Unable to load png : %s\n",SDL_GetError());
+                return;
+                }
+                e->pos_reponse_3.x=0;
+                e->pos_reponse_3.y=450;
+		//e->bonne_reponse=rep;
+
+}
+
+
+void afficherEnigme(enigmeImage e, SDL_Surface * screen){
+ 
+	SDL_BlitSurface(e.question,NULL, screen, &e.pos_question );
+	SDL_BlitSurface(e.reponse_1,NULL,screen,&e.pos_reponse_1);
+        SDL_BlitSurface(e.reponse_2,NULL,screen,&e.pos_reponse_2);
+        SDL_BlitSurface(e.reponse_3,NULL,screen,&e.pos_reponse_3);
+}
+
+void free_surface_enigme( enigmeImage *e ){
+
+	SDL_FreeSurface(e->question);
+	SDL_FreeSurface(e->reponse_1);
+        SDL_FreeSurface(e->reponse_2);
+        SDL_FreeSurface(e->reponse_3);
+}
+
+void animer (enigmeImage * e){
+	
+
+
+
+}
+
+int enigme_Image_alea(){
+
+	SDL_Init(SDL_INIT_EVERYTHING);
+	 SDL_Surface *screen =NULL;
+
+	 screen = SDL_SetVideoMode(1000,600, 32,SDL_HWSURFACE | SDL_DOUBLEBUF); 
+	if ( ! screen ) {
+		printf("to set 600 * 300 voideo :%s /n ", SDL_GetError());
+		return 1 ;
+	 }else{
+	int alea;
+	SDL_Event event;
+	int continuer=0; 
+//	int resultat;
+	SDL_WM_SetCaption("enigme_SANA",NULL);
+	enigmeImage e;
+	SDL_Surface *bg;
+	SDL_Rect pos_bg;
+	bg=IMG_Load("/home/sana/enigme/enigmeImages/bg_EnigmeImage.png");
+	pos_bg.x=0;
+	pos_bg.y=0;
+	pos_bg.w=1000;
+	pos_bg.h=600;
+	SDL_Surface *vrai;
+        SDL_Rect pos_vrai;
+        vrai=IMG_Load("/home/sana/enigme/src/true.png");
+        pos_vrai.x=800;
+        pos_vrai.y=150;
+        pos_vrai.w=1000;
+        pos_vrai.h=600;
+	SDL_Surface *faux;
+        SDL_Rect pos_faux;
+        faux=IMG_Load("/home/sana/enigme/src/false.png");
+        pos_faux.x=800;
+        pos_faux.y=150;
+        pos_faux.w=1000;
+        pos_faux.h=600;
+
+	
+		SDL_BlitSurface(bg,NULL, screen, &pos_bg );
+	        //SDL_Flip(screen); 
+
+		srand(time(0));
+	do {
+		alea = rand()%3 +1;
+	}while ( alea <1 || alea > 3 ); //donne un numero aleatoire entre 1 et 3
+
+	while (continuer==0){
+	switch (alea){
+		case 1:
+		//SDL_BlitSurface(bg,NULL, screen, &pos_bg );
+	        //SDL_Flip(screen); 
+		InitEnigme(&e, "../enigmeFiles/enigme1.txt");
+    		afficherEnigme(e,screen);
+    		SDL_Flip(screen);
+    		while(SDL_PollEvent(&event)){
+
+			switch(event.type){
+				case SDL_QUIT:
+					continuer=1;
+				break;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym){
+						case SDLK_ESCAPE:
+							continuer=1;
+						break;
+						case SDLK_1:
+							 SDL_BlitSurface(faux,NULL, screen, &pos_faux );//affichage de resultat
+						        SDL_Flip(screen);
+							SDL_FreeSurface(bg);
+                                                          free_surface_enigme(&e);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+                                                          //continuer=1;
+							  SDL_Delay(10000);	
+							return 1;//reponse fausse
+
+						break;
+						case SDLK_2:
+							 SDL_BlitSurface(vrai,NULL, screen, &pos_vrai );
+       							 SDL_Flip(screen);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 0;//reponse vrai
+						break;
+						case SDLK_3:
+							 SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+						         SDL_Flip(screen);
+							  free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse fausse
+						break;
+					}
+				break;
+				 case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == SDL_BUTTON_LEFT){
+                    				if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 250 && event.button.y <850 ){
+                                                         SDL_BlitSurface(faux,NULL, screen, &pos_faux );//affichage de resultat
+                                                         SDL_Flip(screen);
+							 free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse fausse
+
+                    				}
+                   				 else if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 350 && event.button.y < 950){
+                                                         SDL_BlitSurface(vrai,NULL, screen, &pos_vrai );
+                                                         SDL_Flip(screen);
+							 free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							//continuer=1;
+							  SDL_Delay(10000);	
+							 return 0;//reponse vrai
+                     				}
+                    				else if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 450 && event.button.y < 1050) {
+                                                         SDL_BlitSurface(faux,NULL, screen, &pos_faux );//affichage de resultat
+                                                         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							return 1;//reponse fausse
+
+                        
+                   				 }
+                			}
+               			 break;
+			}
+		}
+	break;
+	case 2:
+		//SDL_BlitSurface(bg,NULL, screen, &pos_bg );
+	        //SDL_Flip(screen); 
+		InitEnigme(&e, "../enigmeFiles/enigme2.txt");
+    		afficherEnigme(e,screen);
+    		SDL_Flip(screen);
+    		while(SDL_PollEvent(&event)){
+
+			switch(event.type){
+				case SDL_QUIT:
+					continuer=1;
+				break;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym){
+						case SDLK_ESCAPE:
+							continuer=1;
+						break;
+						case SDLK_1:
+							 SDL_BlitSurface(vrai,NULL, screen, &pos_vrai );//affichage de resultat
+						         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 0;//reponse vrai
+
+						break;
+						case SDLK_2:
+							 SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+       							 SDL_Flip(screen);
+							free_surface_enigme(&e);
+                                                         SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+						          //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse vrai
+						break;
+						case SDLK_3:
+							 SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+						         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							//continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse fausse
+						break;
+					}
+				break;
+				 case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == SDL_BUTTON_LEFT){
+                    				if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 250 && event.button.y <850 ){
+                                                         SDL_BlitSurface(vrai,NULL, screen, &pos_vrai );//affichage de resultat
+                                                         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							 //continuer=1;
+							  SDL_Delay(10000);	
+							 return 0;//reponse vrai
+
+                    				}
+                   				 else if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 350 && event.button.y < 950){
+                                                         SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+                                                         SDL_Flip(screen);
+							 free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse vrai
+                     				}
+                    				else if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 450 && event.button.y < 1050) {
+                                                         SDL_BlitSurface(faux,NULL, screen, &pos_faux );//affichage de resultat
+                                                         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse fausse
+                        
+                   				 }
+                			}
+               			 break;
+			}
+		}
+		break;
+		case 3:
+		//SDL_BlitSurface(bg,NULL, screen, &pos_bg );
+	        //SDL_Flip(screen); 
+		InitEnigme(&e, "../enigmeFiles/enigme3.txt");
+    		afficherEnigme(e,screen);
+    		SDL_Flip(screen);
+    		while(SDL_PollEvent(&event)){
+
+			switch(event.type){
+				case SDL_QUIT:
+					continuer=1;
+				break;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym){
+						case SDLK_ESCAPE:
+							continuer=1;
+						break;
+						case SDLK_1:
+							 SDL_BlitSurface(vrai,NULL, screen, &pos_vrai );//affichage de resultat
+						        SDL_Flip(screen);
+							free_surface_enigme(&e);
+							SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							return 0;//reponse vrai
+
+						break;
+						case SDLK_2:
+							 SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+       							 SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							   //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse vrai
+						break;
+						case SDLK_3:
+							 SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+						        SDL_Flip(screen);
+							free_surface_enigme(&e);
+							SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							//continuer=1;
+							  SDL_Delay(10000);	
+							return 1;//reponse fausse
+						break;
+					}
+				break;
+				 case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == SDL_BUTTON_LEFT){
+                    				if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 250 && event.button.y <850 ){
+                                                         SDL_BlitSurface(vrai,NULL, screen, &pos_vrai );//affichage de resultat
+                                                         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+						           //continuer=1;
+							  SDL_Delay(10000);	
+							 return 0;//reponse vrai
+
+                    				}
+                   				 else if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 350 && event.button.y < 950){
+                                                         SDL_BlitSurface(faux,NULL, screen, &pos_faux );
+                                                         SDL_Flip(screen);
+							free_surface_enigme(&e);
+							 SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse vrai
+                     				}
+                    				else if (event.button.x > 0 && event.button.x < 1000 && event.button.y > 450 && event.button.y < 1050) {
+                                                         SDL_BlitSurface(faux,NULL, screen, &pos_faux );//affichage de resultat
+                                                         SDL_Flip(screen);
+							 free_surface_enigme(&e);
+							  SDL_FreeSurface(bg);
+							  SDL_FreeSurface(faux);
+							  SDL_FreeSurface(vrai);
+							  SDL_Flip(screen);
+							  //continuer=1;
+							  SDL_Delay(10000);	
+							 return 1;//reponse fausse
+
+                        
+                   				 }
+                			}
+               			 break;
+			}
+		}
+	break;
+	}
+	//free_surface_enigme(&e);
+	//SDL_FreeSurface(bg);
+	//SDL_FreeSurface(faux);
+	//SDL_FreeSurface(vrai);
+	//SDL_Flip(screen);
+	//SDL_Delay(10000);
+
+        //SDL_Quit();
+
+	}
+	//free_surface_enigme(&e);
+	//SDL_FreeSurface(bg);
+	//SDL_FreeSurface(faux);
+	//SDL_FreeSurface(vrai);
+	//SDL_Flip(screen);
+	//SDL_Delay(10000);
+
+	SDL_Quit();
+	}
+//return resultat;
+}
+

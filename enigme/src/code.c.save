@@ -1,0 +1,85 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(){
+
+	FILE* f = NULL;
+	char caractereLu;
+	int  ligne=1;
+	char quest[100];
+	char rep1[100];
+	char rep2[100];
+	char rep3[100];
+	char  rep[100];
+	f=fopen("/home/sana/enigme/enigmeFiles/enigme1.txt","r");
+	if(f!=NULL){
+
+		/*while (caractereLu!=EOF && ligne<=1){
+           		caractereLu=fgetc(f);
+          		 if (caractereLu=='\n')
+               		 ligne++;
+       		}*/
+
+    		fgets(quest,100,f);
+                fgets(rep1, 100, f);
+		printf("%s",quest);
+                printf("%s", rep1);
+                printf("\n");
+
+	/*	while (caractereLu!=EOF && ligne<2){
+                        caractereLu=fgetc(f);
+                        printf("%s",&caractereLu);
+                         if (caractereLu == '\n'){
+                         ligne++;}
+                }
+
+                printf("ligne 2 \n");    
+                fgets(rep1,100,f);
+		printf("%s",rep1);
+                printf("\n");
+
+		 while (caractereLu!=EOF && ligne<3){
+                        caractereLu=fgetc(f);
+                         if (caractereLu=='\n')
+                         ligne++;
+                }
+
+                fgets(rep2,100,f);
+		printf("%s",rep2);
+                printf("\n");
+
+		while (caractereLu!=EOF && ligne<4){
+                        caractereLu=fgetc(f);
+                         if (caractereLu=='\n')
+                         ligne++;
+                }
+
+                fgets(rep3,100,f);
+		printf("%s",rep3);
+                printf("\n");
+
+		while (caractereLu!=EOF && ligne<5){
+                        caractereLu=fgetc(f);
+                         if (caractereLu=='\n')
+                         ligne++;
+                }
+
+                fgets(rep,100,f);
+		printf("%s",rep3);
+                printf("\n");
+
+		fclose(f);
+		}else {printf("erreur le fichier n'est pas ouvert !!");}
+
+	/*	printf("%s",quest);
+		printf("\n");
+		printf("%s",rep1);
+		printf("\n");
+		printf("%s",rep2);
+		printf("\n");
+		printf("%s",rep3);
+		printf("\n");
+		printf("%s",rep);*/
+return 0;
+}
